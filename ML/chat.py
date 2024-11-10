@@ -1,77 +1,88 @@
 import random
 import requests
 
-# Set your Hugging Face API token
+
 HUGGINGFACE_API_KEY = "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"
 
-# Set the Hugging Face endpoint for sentiment analysis and text generation models
-SENTIMENT_ANALYSIS_MODEL = "distilbert-base-uncased-finetuned-sst-2-english"  # A model for sentiment analysis
-TEXT_GENERATION_MODEL = "gpt-2"  # A model for text generation
 
-# Hugging Face API URL for inference
+EMOTION_ANALYSIS_MODEL = "j-hartmann/emotion-english-distilroberta-base"
+
 API_URL = "https://api-inference.huggingface.co/models"
 
-def analyze_sentiment(text):
-    """Analyze sentiment using Hugging Face sentiment model."""
+def analyze_emotion(text):
+    """Analyze nuanced emotions using Hugging Face emotion detection model."""
     headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
-    payload = {"inputs": [text]}  # Adjusted to ensure compatibility
+    payload = {"inputs": text}
     
-    response = requests.post(f"{API_URL}/{SENTIMENT_ANALYSIS_MODEL}", headers=headers, json=payload)
+    response = requests.post(f"{API_URL}/{EMOTION_ANALYSIS_MODEL}", headers=headers, json=payload)
     
     if response.status_code == 200:
         response_json = response.json()
-        print("Sentiment Analysis Response:", response_json)
+        print("Emotion Analysis Response:", response_json)
         
-        # Access the first element in the outer and inner lists
-        sentiment = response_json[0][0]['label'].lower()  
-        return sentiment
+        # Get the emotion with the highest score
+        emotions = response_json[0]
+        primary_emotion = max(emotions, key=lambda x: x['score'])['label'].lower()
+        
+        return primary_emotion
     else:
-        print("Sentiment Analysis Failed with status code:", response.status_code)  
+        print("Emotion Analysis Failed with status code:", response.status_code)  
         print("Response Content:", response.content)  
-        return "neutral"  
+        return "neutral"
 
-def generate_reframing_message(negative_thought):
-    """Generate a reframing message based on the negative thought."""
-    if negative_thought:
-        reframing_messages = [
-            "Let's explore this thought. Can you recall a time when things turned out better than expected?",
-            "It’s okay to feel this way, but let’s challenge this belief. Can you think of one instance where you overcame a similar situation?",
-            "Remember, every step forward, no matter how small, is progress. You've got this!",
-            "It's completely normal to feel like this sometimes, but it doesn’t define your ability. Let's shift the focus to your strengths."
+def generate_reframing_message(emotion):
+    """Generate a relevant message based on the detected emotion."""
+    reframing_messages = {
+        "anger": [
+            "Take a moment to reflect on what triggered this anger. Consider if there’s a constructive way to address it.",
+            "Anger can be challenging. It might help to channel this energy into a positive activity, like exercise or a creative task."
+        ],
+        "joy": [
+            "That's wonderful! Remember to savor this joyful moment.",
+            "It’s great to hear you’re feeling positive! Enjoy the happiness and think of ways to spread it around."
+        ],
+        "fear": [
+            "Fear can be overwhelming. You might consider listing out your concerns and thinking of small steps to address them.",
+            "Taking things slowly might help manage this fear. Try breaking down any challenges you face into smaller steps."
+        ],
+        "sadness": [
+            "Sadness can feel heavy. Maybe taking a walk or engaging in a comforting activity could lighten things a bit.",
+            "Remember, you don’t have to go through this alone. Reaching out to someone close might provide some comfort."
+        ],
+        "surprise": [
+            "Surprises can bring unexpected emotions. Take some time to process it and think about how you might want to respond.",
+            "New things can be a little unsettling, but they might also lead to positive changes. How do you feel about this surprise?"
+        ],
+        "neutral": [
+            "I’m here whenever you’d like to share more.",
+            "Sometimes, neutral moments give us a chance to recharge. Feel free to tell me anything on your mind."
         ]
-        return random.choice(reframing_messages)
-    return "I couldn't generate a reframing message. Please try again."
+    }
+    
 
-def handle_sentiment_analysis(input_text):
-    """Handle sentiment and generate a response based on sentiment."""
-    sentiment = analyze_sentiment(input_text)  # Assuming you have this function implemented
+    return random.choice(reframing_messages.get(emotion, ["I'm here to support you. Feel free to share more."]))
+
+def handle_emotion_analysis(input_text):
+    """Handle emotion and generate a response based on the detected emotion."""
+    emotion = analyze_emotion(input_text)
+    print("Detected Emotion:", emotion)  
     
-    # For Positive Sentiment
-    if sentiment == 'positive':
-        response = "That's great! You're on the right track. Keep nurturing this positive mindset."
-    
-    # For Negative Sentiment
-    elif sentiment == 'negative':
-        reframing_message = generate_reframing_message(input_text)
-        response = f"{reframing_message} Would you like to try a breathing exercise?"
-    else:
-        response = "I'm not sure about the sentiment. Could you share more thoughts?"
+  
+    reframing_message = generate_reframing_message(emotion)
+    response = f"{reframing_message} Is there anything else you’d like to discuss?"
 
     return response
 
 def chatbot(text):
     """Chatbot function to process the input and generate appropriate responses."""
     if text:
-        # Step 1: Analyze sentiment to determine if the thought needs reframing
-        sentiment = analyze_sentiment(text)
-        print("Detected Sentiment:", sentiment)  # Debug print
+       
+        emotion = analyze_emotion(text)
+        print("Detected Emotion:", emotion) 
 
-        # Step 2: If sentiment is negative, generate a reframing response
-        if sentiment == "negative":
-            reframing_response = generate_reframing_message(text)
-            reply = f"{reframing_response} Would you like to try a breathing exercise?"
-        else:
-            reply = "This thought doesn't appear negative. Keep up the positive mindset!"
+   
+        reframing_response = generate_reframing_message(emotion)
+        reply = f"{reframing_response} Is there anything else you’d like to discuss?"
 
         return reply
     return "I'm here to help with your thoughts!"
