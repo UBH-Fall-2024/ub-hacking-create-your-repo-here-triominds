@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighten. - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(45deg, #1a2980, #26d0ce); 
+            background-size: 200% 200%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 1.5s ease;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        .logo-container.move-to-corner {
+            top: 0px;
+            left: 0px;
+            width: auto;
+            height: auto;
+        }
+
+        .logo {
+            width: 60vw;
+            height: auto;
+            transition: all 1.5s ease;
+            object-fit: contain;
+        }
+
+        .logo.minimize {
+            width: 200px;
+        }
+
+        .logo.minimize:hover {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-text {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .welcome-text h1 {
+            font-family: 'Pinyon Script', cursive;
+
+            font-size: 3.5rem;
+            color: #F0F1F5;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-text p {
+            font-family: 'Pinyon Script', cursive;
+
+            font-size: 1.8rem;
+            color: #F0F1F5;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-text.show {
+            opacity: 1;
+        }
+
+        /* Updated Login Button Styles */
+        .login-button {
+            position: fixed;
+            top: 55px;
+            right: 30px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid white;
+            border-radius: 25px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            z-index: 1000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            height: 42px;
+        }
+
+        /* Optional: Add a subtle drop shadow to make it stand out */
+        .login-button {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-button:hover {
+            background: white;
+            color: #FF8C00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-button.show {
+            opacity: 1;
+        }
+
+        .login-button:hover {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes buttonFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .login-button.show {
+            animation: buttonFadeIn 0.5s ease forwards;
+        }
+
+        /* Updated Flash Cards Container */
+        .flash-cards-container {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .flash-cards-container.show {
+            opacity: 1;
+        }
+
+        /* Updated Flash Card Styles */
+        .flash-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            width: 320px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color:#F0F1F5;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            animation: float 6s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .flash-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .flash-card .quote {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .flash-card .author {
+            font-family: 'Pacifico', cursive;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-25px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+
+        .flash-card:nth-child(1) { animation-delay: 0s; }
+        .flash-card:nth-child(2) { animation-delay: 2s; }
+        .flash-card:nth-child(3) { animation-delay: 4s; }
+
+        
+        .flash-card .quote,
+        .flash-card .author {
+            transition: opacity 0.5s ease;
+        }
+
+        .flash-card.changing .quote,
+        .flash-card.changing .author {
+            opacity: 0;
+        }
+
+        /* Add this to your existing styles */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a2980, #26d0ce);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-transition.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Add these new transition styles */
+        .logo-container.first-transition {
+            transform: scale(0.8);
+            filter: brightness(1.2);
+        }
+
+        .logo-container.pulse {
+            animation: pulseBrightness 1s ease;
+        }
+
+        @keyframes pulseBrightness {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
+            100% { filter: brightness(1); }
+        }
+
+        .initial-text.slide-down {
+            transform: translate(-50%, 20px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        /* Optional: Add a subtle glow effect */
+        .logo-container.glow {
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.5));
+            transition: filter 1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-transition">
+        <div class="loader"></div>
+    </div>
+
+    <div class="logo-container">
+        <img src="./Logo1.png" alt="Logo" class="logo">
+    </div>
+    
+    <button class="login-button" onclick="login()">Login</button>
+    
+    <div class="welcome-text">
+        <h1>Welcome</h1>
+        <p>Lighten. - Lighten your load with a listening ear</p>
+    </div>
+
+    <div class="flash-cards-container">
+        <div class="flash-card">
+            <p class="quote"></p>
+            <span class="author"></span>
+        </div>
+        <div class="flash-card">
+            <p class="quote"></p>
+            <span class="author"></span>
+        </div>
+        <div class="flash-card">
+            <p class="quote"></p>
+            <span class="author"></span>
+        </div>
+    </div>
+
+    <script>
+        // Array of quotes
+        const quotes = [
+            {
+                text: "Your mental health is a priority. Your happiness is essential. Your self-care is a necessity.",
+                author: ""
+            },
+            {
+                text: "You don't have to control your thoughts. You just have to stop letting them control you.",
+                author: "Dan Millman"
+            },
+            {
+                text: "Recovery is not one and done. It is a lifelong journey that takes place one day, one step at a time.",
+                author: ""
+            },
+            {
+                text: "Mental health problems don't define who you are. They are something you experience.",
+                author: "Mental Health Foundation"
+            },
+            {
+                text: "You are not alone. You are seen. You are heard. You are loved.",
+                author: ""
+            },
+            {
+                text: "It's okay to not be okay – it means that your mind is trying to heal itself.",
+                author: "Jasmine Warga"
+            },
+            {
+                text: "Self-care is not selfish. You cannot serve from an empty vessel.",
+                author: "Eleanor Brown"
+            },
+            {
+                text: "Your present circumstances don't determine where you can go; they merely determine where you start.",
+                author: "Nido Qubein"
+            },
+            {
+                text: "You are stronger than you know, braver than you believe, and smarter than you think.",
+                author: "Christopher Robin"
+            },
+            {
+                text: "The strongest people are those who win battles we know nothing about.",
+                author: ""
+            },
+            {
+                text: "You deserve to take up space in the world and feel safe doing so.",
+                author: ""
+            },
+            {
+                text: "This too shall pass. No feeling is final.",
+                author: "Rainer Maria Rilke"
+            },
+            {
+                text: "You are not defined by your struggles, but by how you overcome them.",
+                author: ""
+            },
+            {
+                text:"Happiness can be found even in the darkest of times, if one only remembers to turn on the light.",
+                author: "J.K. Rowling"
+            },
+            {
+                text: "Be patient with yourself. Nothing in nature blooms all year.",
+                author: ""
+            },
+            {
+                text: "Sometimes the best thing you can do is to take a deep breath and remind yourself that you are doing the best you can.",
+                author: ""
+            },
+            {
+                text: "You have been through so much, and you are still here. Take a moment to appreciate your strength.",
+                author: ""
+            },
+            {
+                text: "The sun will rise, and we will try again.",
+                author: ""
+            },
+            {
+                text: "It's never too late to start again. You are allowed to take up space and grow.",
+                author: ""
+            }
+        ];
+
+        // Function to get random quote
+        function getRandomQuote(excludeQuotes = []) {
+            const availableQuotes = quotes.filter(quote => 
+                !excludeQuotes.some(eq => eq.text === quote.text)
+            );
+            return availableQuotes[Math.floor(Math.random() * availableQuotes.length)];
+        }
+
+        // Function to update quotes on cards
+        function updateQuotes() {
+            const cards = document.querySelectorAll('.flash-card');
+            const usedQuotes = [];
+
+            cards.forEach(card => {
+                card.classList.add('changing');
+                
+                setTimeout(() => {
+                    const newQuote = getRandomQuote(usedQuotes);
+                    usedQuotes.push(newQuote);
+                    
+                    const quoteElement = card.querySelector('.quote');
+                    const authorElement = card.querySelector('.author');
+                    
+                    quoteElement.textContent = newQuote.text;
+                    authorElement.textContent = `- ${newQuote.author}`;
+                    
+                    card.classList.remove('changing');
+                }, 500);
+            });
+        }
+
+        function login(){
+            console.log("--in login");
+            // const googleAuth = () => {
+                window.open(
+                    `http://localhost:8080/auth/google/callback`,
+                    "_self"
+                );
+	      //  };
+        }
+
+        // Initial quotes
+        updateQuotes();
+
+        // Update quotes every 10 seconds
+        setInterval(updateQuotes, 10000);
+
+        // Previous script content
+        const logoContainer = document.querySelector('.logo-container');
+        const logo = document.querySelector('.logo');
+        const welcomeText = document.querySelector('.welcome-text');
+        const loginButton = document.querySelector('.login-button');
+        const flashCardsContainer = document.querySelector('.flash-cards-container');
+
+        setTimeout(() => {
+            logoContainer.classList.add('move-to-corner');
+            logo.classList.add('minimize');
+            
+            setTimeout(() => {
+                welcomeText.classList.add('show');
+                loginButton.classList.add('show');
+                flashCardsContainer.classList.add('show');
+            }, 1000);
+            
+        }, 2000);
+
+        // Click handler for cards to force quote update
+        document.querySelectorAll('.flash-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.add('changing');
+                setTimeout(() => {
+                    const newQuote = getRandomQuote();
+                    card.querySelector('.quote').textContent = newQuote.text;
+                    card.querySelector('.author').textContent = `- ${newQuote.author}`;
+                    card.classList.remove('changing');
+                }, 500);
+            });
+        });
+
+        const pageTransition = document.querySelector('.page-transition');
+
+        // loginButton.addEventListener('click', () => {
+        //     // Show transition overlay with loader
+        //     pageTransition.classList.add('active');
+            
+        //     // Wait for overlay animation
+        //     setTimeout(() => {
+        //         // Redirect to chatbot page
+        //         window.location.href = 'chatbot.html';
+        //     }, 800);
+        // });
+
+        const initialText = document.querySelector('.initial-text');
+
+        // Show initial text
+        setTimeout(() => {
+            if(initialText)
+                initialText.classList.add('show');
+        }, 500);
+
+        // First transition
+        setTimeout(() => {
+            logoContainer.classList.add('first-transition');
+            logoContainer.classList.add('glow');
+        }, 2000);
+
+        // Pulse effect
+        setTimeout(() => {
+            logoContainer.classList.add('pulse');
+            if(initialText)
+                initialText.classList.add('slide-down');
+        }, 3000);
+
+        // Final transition to corner
+        setTimeout(() => {
+            logoContainer.classList.remove('first-transition', 'pulse', 'glow');
+            logoContainer.classList.add('move-to-corner');
+            logo.classList.add('minimize');
+            
+            setTimeout(() => {
+                welcomeText.classList.add('show');
+                loginButton.classList.add('show');
+            }, 1000);
+        }, 4000);
+    </script>
+</body>
+</html>

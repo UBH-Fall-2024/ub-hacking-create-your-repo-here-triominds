@@ -4,8 +4,8 @@ const pool = createPool({
     host: "localhost",
     user: "root",
     password:"",
-    database: "test",
+    database: "lighten",
     connectionLimit: 5
 })
 
-pool.query(`select * from test`);
+// pool.query(`select * from test`);
