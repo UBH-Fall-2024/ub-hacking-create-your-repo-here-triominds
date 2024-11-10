@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighten - Support Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #1a2980, #26d0ce); 
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .header {
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .logo {
+            width: 200px;
+            height: auto;
+            transition: all 0.3s ease;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        .header-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            opacity: 0;
+            white-space: nowrap;
+            transition: all 1.5s ease;
+        }
+
+        .header-text.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 2.8rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: all 1.5s ease;
+        }
+
+        .header-text p {
+            margin: 0;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: all 1.5s ease;
+            transition-delay: 0.3s;
+            font-weight: 500;
+        }
+
+        .header-text.show p {
+            opacity: 0.9;
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-header {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 15px;
+            animation: messageAppear 0.3s ease;
+        }
+
+        .bot-message {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background: #FF8C00;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            background: #FF8C00;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        .chat-input button:hover {
+            background: #FF6B00;
+            transform: translateY(-2px);
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            align-self: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #FF8C00;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: typing 1s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Add a home button */
+        .home-button {
+            position: fixed;
+            top: 80px;
+            right: 30px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid white;
+            border-radius: 25px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+          
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            letter-spacing: 1px;
+            z-index: 1000;
+        }
+
+        .home-button:hover {
+            background: white;
+            color: #FF8C00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Add loading animation */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            
+            background: linear-gradient(45deg, #1a2980, #26d0ce); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Confirmation dialog styles */
+        .confirmation-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 2000;
+        }
+
+        .confirmation-dialog.show {
+            display: block;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .dialog-buttons button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-buttons .confirm {
+            background: #FF8C00;
+            color: white;
+        }
+
+        .dialog-buttons .cancel {
+            background: #ccc;
+            color: #333;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        /* Add these styles for the options buttons */
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 0 15px;
+        }
+
+        .option-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 25px;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .option-button:hover {
+            background: white;
+            color: #1a2980;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Add animation for buttons appearing */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .option-button {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Stagger the animation for each button */
+        .option-button:nth-child(1) { animation-delay: 0.1s; }
+        .option-button:nth-child(2) { animation-delay: 0.2s; }
+        .option-button:nth-child(3) { animation-delay: 0.3s; }
+        .option-button:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="images/logo1.png" alt="Lighten Logo" class="logo">
+        <div class="header-text">
+            <h1>Welcome</h1>
+            <p>Let's fight the battles together</p>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Grab some snacks</h2>
+            <p>I would love to hear about your day :)</p>
+        </div>
+
+        <div class="chat-messages">
+            
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" placeholder="Type your message here..." id="userInput">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <a href="#" class="home-button" id="homeButton">Home</a>
+
+    <div class="confirmation-dialog" id="confirmDialog">
+        <p>Are you sure you want to leave the chat?</p>
+        <div class="dialog-buttons">
+            <button class="cancel" id="cancelButton">Cancel</button>
+            <button class="confirm" id="confirmButton">Leave Chat</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.querySelector('.chat-messages');
+        const chatInput = document.querySelector('.chat-input input');
+        const sendButton = document.querySelector('.chat-input button');
+
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add(`${sender}-message`);
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to show options
+        function showOptions() {
+            const optionsContainer = document.createElement('div');
+            optionsContainer.classList.add('options-container');
+            optionsContainer.innerHTML = `
+                <button class="option-button" onclick="handleOption('Grateful')">Grateful</button>
+                <button class="option-button" onclick="handleOption('Happy')">Happy</button>
+                <button class="option-button" onclick="handleOption('Wanting to feel Happy')">Wanting to feel Happy</button>
+                <button class="option-button" onclick="handleOption('Sad')">Sad</button>
+            `;
+            chatMessages.appendChild(optionsContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to handle option selection
+        function handleOption(choice) {
+            // Remove existing options
+            const optionsContainer = document.querySelector('.options-container');
+            if (optionsContainer) {
+                optionsContainer.remove();
+            }
+
+            // Add user's choice as a message
+            addMessage(choice, 'user');
+
+            // Bot response based on choice
+            setTimeout(() => {
+                let response;
+                switch(choice) {
+                    case 'Grateful':
+                        response = "That's wonderful! Gratitude is a powerful emotion. What are you most grateful for today?";
+                        break;
+                    case 'Happy':
+                        response = "I'm so glad you're feeling happy! Would you like to share what's bringing you joy today?";
+                        break;
+                    case 'Wanting to feel Happy':
+                        response = "It's okay to feel this way. Let's work together to find some moments of joy. What usually helps lift your spirits?";
+                        break;
+                    case 'Sad':
+                        response = "I hear you, and it's okay to feel sad. Would you like to talk about what's troubling you?";
+                        break;
+                }
+                addMessage(response, 'bot');
+            }, 1000);
+        }
+
+        // Start conversation
+        window.onload = function() {
+            setTimeout(() => {
+                addMessage("Hello! How's your heart today?", 'bot');
+                setTimeout(showOptions, 1000);
+            }, 1500);
+        };
+
+        // Handle send button click
+        sendButton.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                addMessage(message, 'user');
+                chatInput.value = '';
+                // Add bot response logic here
+            }
+        });
+
+        // Handle enter key
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, 'user');
+                    chatInput.value = '';
+                    // Add bot response logic here
+                }
+            }
+        });
+
+        // Remove loading screen after page loads
+        window.addEventListener('load', () => {
+            const loadingScreen = document.querySelector('.loading-screen');
+            setTimeout(() => {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Add confirmation before leaving chat
+        window.addEventListener('beforeunload', (e) => {
+            const confirmationMessage = 'Are you sure you want to leave the chat?';
+            (e || window.event).returnValue = confirmationMessage;
+            return confirmationMessage;
+        });
+
+        // Home button click handler
+        document.getElementById('homeButton').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('confirmDialog').classList.add('show');
+        });
+
+        // Cancel button handler
+        document.getElementById('cancelButton').addEventListener('click', () => {
+            document.getElementById('confirmDialog').classList.remove('show');
+        });
+
+        // Confirm button handler
+        document.getElementById('confirmButton').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // Close dialog when clicking outside
+        window.addEventListener('click', (e) => {
+            const dialog = document.getElementById('confirmDialog');
+            if (e.target === dialog) {
+                dialog.classList.remove('show');
+            }
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.header-text').classList.add('show');
+            }, 1500); // Starts after page load
+        });
+    </script>
+</body>
+</html> 
