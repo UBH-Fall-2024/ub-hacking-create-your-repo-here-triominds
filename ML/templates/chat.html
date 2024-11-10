@@ -396,7 +396,7 @@
             <p>I would love to hear about your day :)</p>
         </div>
 
-        <div class="chat-messages">
+        <div class="chat-messages" id="chat-box">
             
             <div class="typing-indicator">
                 <span></span>
@@ -405,9 +405,11 @@
             </div>
         </div>
 
-        <div class="chat-input">
-            <input type="text" placeholder="Type your message here..." id="userInput">
-            <button onclick="sendMessage()">Send</button>
+       
+		
+		<div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message..." />
+            <button id="send-btn">Send</button>
         </div>
     </div>
 
@@ -424,7 +426,7 @@
             <button class="confirm" id="confirmButton">Leave Chat</button>
         </div>
     </div>
-
+	<script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
         const chatMessages = document.querySelector('.chat-messages');
         const chatInput = document.querySelector('.chat-input input');
@@ -547,6 +549,38 @@
         // Confirm button handler
         document.getElementById('confirmButton').addEventListener('click', () => {
             window.location.href = 'index.html';
+        });
+		
+		document.getElementById("send-btn").addEventListener('click', function() {
+            const userInput = document.getElementById("user-input").value;
+            console.log(userInput);
+            // Send a POST request to the /chat endpoint
+            fetch("/chat", {
+                method: "POST",  // Ensure POST is used, not GET
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ messageText: userInput })  // Send the user input as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                // const chatBox = document.getElementById("chat-box");
+
+                // // Format user and bot messages with appropriate classes for styling
+                // const userMessage = `<div class="message user-message">${userInput}</div>`;
+                // const botReply = `<div class="message bot-message">${data.answer}</div>`;
+
+                // // Append messages to the chat box
+                // chatBox.innerHTML += userMessage + botReply;
+
+                // // Scroll to the bottom of the chat container
+                // chatBox.scrollTop = chatBox.scrollHeight;
+                message = data.answer;
+                addMessage(message, 'bot');
+                // Clear the input field after sending
+               // document.getElementById("user-input").value = "";
+            })
+            .catch(error => console.error("Error:", error));
         });
 
         // Close dialog when clicking outside

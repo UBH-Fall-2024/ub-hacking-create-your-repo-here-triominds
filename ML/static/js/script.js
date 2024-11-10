@@ -11,11 +11,17 @@ document.getElementById("send-btn").addEventListener("click", function() {
   })
   .then(response => response.json())
   .then(data => {
-    const chatBox = document.getElementById("chat-box");
-    const userMessage = `<div class="user-msg">${userInput}</div>`;
-    const botReply = `<div class="bot-msg">${data.answer}</div>`;
-    chatBox.innerHTML += userMessage + botReply;
-    document.getElementById("user-input").value = "";  // Clear input field after sending
+    // const chatBox = document.getElementById("chat-box");
+    // const userMessage = `<div class="user-msg">${userInput}</div>`;
+    // const botReply = `<div class="bot-msg">${data.answer}</div>`;
+    // chatBox.innerHTML += userMessage + botReply;
+    // document.getElementById("user-input").value = "";  // Clear input field after sending
+
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add(`bot-message`);
+    messageDiv.textContent = data.answer;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   })
   .catch(error => console.error("Error:", error));
 });
